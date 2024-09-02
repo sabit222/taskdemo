@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Управление задачами</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f0f2f5;
+      color: #333;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 15px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #007bff;
+      margin-bottom: 20px;
+      font-size: 2rem;
+    }
+
+    h2 {
+      border-bottom: 2px solid #007bff;
+      padding-bottom: 8px;
+      margin-bottom: 15px;
+      color: #555;
+      font-size: 1.5rem;
+    }
+
+    fieldset {
+      border: none;
+      padding: 0;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 4px;
+      color: #666;
+      font-size: 0.875rem;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: calc(100% - 20px);
+      padding: 10px;
+      margin-bottom: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+
+    .form-group input[type="checkbox"] {
+      width: auto;
+      margin-right: 8px;
+    }
+
+    .form-group button {
+      background: linear-gradient(45deg, #007bff, #0056b3);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .form-group button:hover {
+      background: linear-gradient(45deg, #0056b3, #003f7f);
+    }
+
+    .form-group button:active {
+      transform: scale(0.95);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      font-size: 1rem;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #007bff;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    .btn-back {
+      background: linear-gradient(45deg, #28a745, #218838);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+      margin-bottom: 15px;
+    }
+
+    .btn-back:hover {
+      background: linear-gradient(45deg, #218838, #1e7e34);
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <a href="/employee" class="btn-back">Вернуться к списку сотрудников</a>
+
+  <h1>Управление задачами</h1>
+
+  <!-- Форма для создания или обновления задачи -->
+  <form action="/tasks" method="post">
+    <fieldset>
+      <legend>Создать или обновить задачу</legend>
+
+      <div class="form-group">
+        <label for="id">ID задачи:</label>
+        <input type="number" id="id" name="id" placeholder="Оставьте пустым для создания" min="1">
+      </div>
+
+      <div class="form-group">
+        <label for="description">Описание:</label>
+        <input type="text" id="description" name="description" required>
+      </div>
+
+      <div class="form-group">
+        <label for="completed">Завершена:</label>
+        <input type="checkbox" id="completed" name="completed">
+      </div>
+
+      <div class="form-group">
+        <label for="dueDate">Дата выполнения:</label>
+        <input type="date" id="dueDate" name="dueDate">
+      </div>
+
+      <div class="form-group">
+        <label for="priority">Приоритет:</label>
+        <select id="priority" name="priority">
+          <option value="LOW">Низкий</option>
+          <option value="MEDIUM">Средний</option>
+          <option value="HIGH">Высокий</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="employee">Сотрудник:</label>
+        <select id="employee" name="employee">
+          <option value="" disabled selected>Выберите сотрудника</option>
+          <!-- Пример использования Thymeleaf для списка сотрудников -->
+          <tr th:each="employee : ${employees}">
+            <option th:value="${employee.id}" th:text="${employee.name}"></option>
+          </tr>
+        </select>
+      </div>
+
+      <input type="hidden" name="_method" value="POST">
+      <div class="form-group">
+        <button type="submit">Сохранить задачу</button>
+      </div>
+    </fieldset>
+  </form>
+
+  <!-- Форма для удаления задачи -->
+  <form action="/tasks" method="post">
+    <fieldset>
+      <legend>Удалить задачу</legend>
+
+      <div class="form-group">
+        <label for="deleteId">ID задачи:</label>
+        <input type="number" id="deleteId" name="id" min="1" required>
+      </div>
+
+      <input type="hidden" name="_method" value="DELETE">
+      <div class="form-group">
+        <button type="submit">Удалить задачу</button>
+      </div>
+    </fieldset>
+  </form>
+
+  <!-- Отображение задач -->
+  <h2>Список задач</h2>
+  <table>
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Описание</th>
+      <th>Сотрудник</th>
+      <th>Завершена</th>
+      <th>Дата выполнения</th>
+      <th>Приоритет</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Используем Thymeleaf для генерации строк таблицы -->
+    <tr th:each="task : ${tasks}">
+      <td th:text="${task.id}"></td>
+      <td th:text="${task.description}"></td>
+      <td th:text="${task.employee != null ? task.employee.name : 'Не назначен'}"></td>
+      <td th:text="${task.completed ? 'Да' : 'Нет'}"></td>
+      <td th:text="${task.dueDate}"></td>
+      <td th:text="${task.priority}"></td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

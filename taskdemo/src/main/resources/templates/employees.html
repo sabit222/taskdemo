@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Управление задачами и сотрудниками</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <style>
+    body {
+      padding-top: 30px;
+      padding-bottom: 30px;
+      background-color: #f0f2f5;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .container {
+      max-width: 960px;
+    }
+    .card {
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      background: #ffffff;
+      margin-bottom: 20px;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    }
+    .card-header {
+      background: linear-gradient(135deg, #007bff, #0056b3);
+      color: #ffffff;
+      border-radius: 12px 12px 0 0;
+      padding: 15px;
+      font-size: 1.5rem;
+      text-align: center;
+    }
+    .card-body {
+      padding: 20px;
+    }
+    .table thead th {
+      background: #007bff;
+      color: #ffffff;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1rem;
+    }
+    .table td, .table th {
+      font-size: 1rem;
+      padding: 15px;
+    }
+    .btn-custom {
+      background: linear-gradient(135deg, #007bff, #0056b3);
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      transition: background 0.3s ease, transform 0.2s;
+    }
+    .btn-custom:hover {
+      background: linear-gradient(135deg, #0056b3, #003f7f);
+      transform: translateY(-2px);
+    }
+    .btn-success {
+      background: linear-gradient(135deg, #28a745, #218838);
+      border-color: #28a745;
+      border-radius: 6px;
+      color: #ffffff;
+    }
+    .btn-success:hover {
+      background: linear-gradient(135deg, #218838, #1e7e34);
+    }
+    .btn-danger {
+      background: linear-gradient(135deg, #dc3545, #c82333);
+      border-color: #dc3545;
+      border-radius: 6px;
+      color: #ffffff;
+    }
+    .btn-danger:hover {
+      background: linear-gradient(135deg, #c82333, #b21f2d);
+    }
+    .form-control {
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      padding: 10px;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .form-control:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 8px rgba(0, 123, 255, 0.25);
+    }
+    .result p {
+      font-size: 1.25rem;
+      font-weight: bold;
+    }
+    h1, h2 {
+      font-weight: 700;
+    }
+    .footer {
+      text-align: center;
+      padding: 20px 0;
+      margin-top: 20px;
+      border-top: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- Список сотрудников -->
+  <div class="card">
+    <div class="card-header">
+      Список сотрудников
+    </div>
+    <div class="card-body">
+      <a href="/employee/new" class="btn btn-custom mb-3">Добавить нового сотрудника</a>
+      <table class="table table-striped table-bordered">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Имя</th>
+          <th>Должность</th>
+          <th>Зарплата</th>
+          <th>Дополнительные сведения</th>
+          <th>Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="employee : ${employees}">
+          <td th:text="${employee.id}"></td>
+          <td th:text="${employee.name}"></td>
+          <td th:text="${employee.position}"></td>
+          <td th:text="${employee.salary}"></td>
+          <td th:text="${employee.feature}"></td>
+          <td>
+            <a th:href="@{/employee/edit/{id}(id=${employee.id})}" class="btn btn-success btn-sm">Редактировать</a>
+            <form th:action="@{/employee/delete/{id}(id=${employee.id})}" method="post" style="display:inline;">
+              <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+            </form>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Конвертер валют -->
+  <div class="card">
+    <div class="card-header">
+      Конвертер валют в тенге
+    </div>
+    <div class="card-body">
+      <form action="/employee/convert" method="post">
+        <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+        <div class="form-group">
+          <label for="baseCurrency">Исходная валюта:</label>
+          <select id="baseCurrency" name="baseCurrency" class="form-control" required>
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="RUB">RUB</option>
+            <!-- Добавьте другие валюты по необходимости -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="amount">Сумма:</label>
+          <input type="number" id="amount" name="amount" class="form-control" step="0.01" min="0.01" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Конвертировать</button>
+      </form>
+
+      <div class="result mt-4" th:if="${result != null}">
+        <h3 class="text-center">Результат конвертации</h3>
+        <p class="text-center" th:text="'Сумма ' + ${amount} + ' ' + ${baseCurrency} + ' равна ' + ${result} + ' KZT'"></p>
+      </div>
+
+      <div class="alert alert-danger mt-3" role="alert" th:if="${error != null}" th:text="${error}"></div>
+    </div>
+  </div>
+
+  <!-- Управление задачами -->
+  <div class="card">
+    <div class="card-header">
+      Управление задачами
+    </div>
+    <div class="card-body text-center">
+      <a href="/tasks" class="btn btn-custom">Создать новую задачу</a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    &copy; 2024 Управление задачами и сотрудниками
+  </div>
+</div>
+</body>
+</html>
+
+
